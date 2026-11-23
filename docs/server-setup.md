@@ -21,12 +21,12 @@ Playbook загружает и запускает уже проверенный 
 ## 10. Ansible
 
 Проект находится в каталоге `ansible/`. Управляющий узел — macOS с Ansible
-Core 2.19. Управляемый узел — Ubuntu Server 26.04 LTS ARM64, `devops-vm-pr11` в
+Core 2.20. Управляемый узел — Ubuntu Server 26.04 LTS ARM64, `devops-vm-pr11` в
 VirtualBox. Для этой работы используется Host-only `192.168.56.103:22`;
 параметры NAT и порт 5002 выше относятся к ручной проверке из ПР10.
 
 - `inventory/bootstrap.ini`: пользователь `student`, пароль SSH и пароль sudo
-  запрашиваются интерактивно. Ansible Core 2.19 передаёт SSH-пароль через
+  запрашиваются интерактивно. Ansible Core 2.20 передаёт SSH-пароль через
   `SSH_ASKPASS`.
 - `inventory/prod.ini`: пользователь `devops`, ключ `~/.ssh/devops_vm`,
   `sudo -n` после первичной настройки. Это inventory задано в `ansible.cfg`.
