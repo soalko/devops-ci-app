@@ -1,0 +1,64 @@
+---
+- name: Assert supported VM platform
+  ansible.builtin.assert:
+    that:
+      - ansible_facts.distribution == 'Ubuntu'
+      - ansible_facts.distribution_version in ['24.04', '26.04']
+      - ansible_facts.architecture in ['aarch64', 'x86_64']
+    fail_msg: Ubuntu Server 24.04 or 26.04 on ARM64 or AMD64 is required
+
+- name: Refresh Ubuntu package metadata if stale
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 3600
+    lock_timeout: 300
+  changed_when: false
+
+- name: Install base packages and remote module dependencies
+  ansible.builtin.apt:
+    name:
+      - ca-certificates
+      - curl
+      - gnupg
+      - openssh-server
+      - ufw
+      - python3-debian
+      - python3-requests
+    state: present
+    lock_timeout: 300
+
+- name: Add Docker official repository
+  ansible.builtin.deb822_repository:
+    name: docker
+    types: [deb]
+    uris: https://download.docker.com/linux/ubuntu
+    suites: '{{ ansible_facts.distribution_release }}'
+    components: [stable]
+    architectures: ['{{ {"aarch64": "arm64", "x86_64": "amd64"}[ansible_facts.architecture] }}']
+    signed_by: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+  register: docker_repository
+
+- name: Refresh metadata for the new Docker repository
+  ansible.builtin.apt:
+    update_cache: true
+    lock_timeout: 300
+  changed_when: false
+  when: docker_repository.changed
+
+- name: Install Docker Engine
+  ansible.builtin.apt:
+    name:
+      - docker-ce
+      - docker-ce-cli
+      - containerd.io
+      - docker-buildx-plugin
+      - docker-compose-plugin
+    state: present
+    lock_timeout: 300
+
+- name: Enable Docker service
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: true

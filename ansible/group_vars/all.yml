@@ -1,0 +1,6 @@
+---
+app_image: ghcr.io/soalko/devops-ci-app
+app_tag: '9989059ef8022a65479483910861663795b329ba'
+app_container_name: devops-ci-app
+app_host_port: 5000
+app_internal_port: 5000
